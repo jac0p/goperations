@@ -27,6 +27,7 @@ func main() {
         fmt.Println(line.Text)
         // fmt.Println(<-ch) // TODO: receive lines from channel either in this loop or another 
         // f.WriteString(<-ch + "\n") TODO: eventually write results to target log
+        // TODO: every appended line in target file should include name of source file
     }
 }
 
