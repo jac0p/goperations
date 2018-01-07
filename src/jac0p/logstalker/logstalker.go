@@ -14,12 +14,18 @@ var outPtr = flag.String("out", "out", "indicates where the application should s
 func Start() {
     // ch := make(chan string) // channel initialization
     flag.Parse() // parse flags
-
     sources := ChkParams(flag.Args()) // sends arguments without flags
+
     fmt.Printf("SOURCES: %s\n", sources)
     fmt.Printf("FLAG: %v\n", *outPtr)
 
-    // goroutine here to start reading files => startStalk function contains code
+    // goroutine to start reading files
+    for _, src := range sources {
+        if CheckIfFile(src) {
+            fmt.Printf("YEAAAH: %s\n", src)
+            // go stalkFile(src, ch)
+        }
+    }
 }
 
 func ChkParams(args []string) ([]string) {
@@ -31,26 +37,45 @@ func ChkParams(args []string) ([]string) {
 }
 
 func CreateTG() {
-    // f, _ := os.Create(filepath.Abs("./data") + "/newlog.log") 
     path, _ := filepath.Abs("./data")
     os.Create(path + "/newlog.log") // hardcoded for now
+    // f, _ := os.Create(path + "/newlog.log") 
 }
 
-func startStalk(ch chan<- string) {
-    // loops through cli params and starts tailing concurrently
-    for _, sf := range os.Args[1:] {
-        go stalkFile(sf, ch)
-    }
-}
-
-func stalkFile(source string, ch chan<- string) {
-    // tails file and sends results to channel
-    t, err := tail.TailFile(source, tail.Config{Follow: true}) // tail source file
+func CheckIfFile(src string) bool {
+    f, err := os.Stat(src)
     if err != nil {
-        ch <- fmt.Sprintf("error while reading %s: %v", source, err) // send error to channel
+        fmt.Printf("error running stat on %s\n", src)
+        return false
+    }
+    switch fm := f.Mode(); {
+    case fm.IsDir():
+        return false
+    case fm.IsRegular():
+        return true
+    }
+    panic("this should never happen")
+}
+
+func WalkDir(dir string) []string {
+    o := []string{}
+    filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+        if CheckIfFile(path) {
+            o = append(o, path)
+        }
+        return nil
+    })
+    return o
+}
+
+func stalkFile(src string, ch chan<- string) {
+    // tails file and sends results to channel
+    t, err := tail.TailFile(src, tail.Config{Follow: true}) // tail source file
+    if err != nil {
+        ch <- fmt.Sprintf("error while reading %s: %v", src, err) // send error to channel
     }
     for line := range t.Lines {
-        ch <- fmt.Sprintf("%s | %s", source, line)
+        ch <- fmt.Sprintf("%s | %s", src, line)
     }
 }
 
