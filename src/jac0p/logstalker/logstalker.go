@@ -9,23 +9,24 @@ import (
 )
 
 
-var outPtr = flag.String("out", "out", "indicates where the application should send it's output")
-
 func Start() {
     // ch := make(chan string) // channel initialization
+    flag.String("out", "out", "indicates where the application should send it's output")
     flag.Parse() // parse flags
-    sources := ChkParams(flag.Args()) // sends arguments without flags
+    params := ChkParams(flag.Args()) // sends arguments without flags
+    sources := []string{}
 
-    fmt.Printf("SOURCES: %s\n", sources)
-    fmt.Printf("FLAG: %v\n", *outPtr)
-
-    // goroutine to start reading files
-    for _, src := range sources {
-        if CheckIfFile(src) {
-            fmt.Printf("YEAAAH: %s\n", src)
-            // go stalkFile(src, ch)
+    // find all source files
+    for _, p := range params {
+        if CheckIfFile(p) {
+            sources = append(sources, p)
+        }
+        if CheckIfDir(p) {
+            sources = append(sources, WalkDir(p)...)
         }
     }
+
+    // go StalkFile(sources, ch)
 }
 
 func ChkParams(args []string) ([]string) {
@@ -36,12 +37,7 @@ func ChkParams(args []string) ([]string) {
     return args
 }
 
-func CreateTG() {
-    path, _ := filepath.Abs("./data")
-    os.Create(path + "/newlog.log") // hardcoded for now
-    // f, _ := os.Create(path + "/newlog.log") 
-}
-
+// SOOOO DRYYYYYY
 func CheckIfFile(src string) bool {
     f, err := os.Stat(src)
     if err != nil {
@@ -57,6 +53,22 @@ func CheckIfFile(src string) bool {
     panic("this should never happen")
 }
 
+// SOOOO DRYYYYYY
+func CheckIfDir(src string) bool {
+    f, err := os.Stat(src)
+    if err != nil {
+        fmt.Printf("error running stat on %s\n", src)
+        return false
+    }
+    switch fm := f.Mode(); {
+    case fm.IsDir():
+        return true
+    case fm.IsRegular():
+        return false
+    }
+    panic("this should never happen")
+}
+
 func WalkDir(dir string) []string {
     o := []string{}
     filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
@@ -68,7 +80,13 @@ func WalkDir(dir string) []string {
     return o
 }
 
-func stalkFile(src string, ch chan<- string) {
+func CreateTG() {
+    path, _ := filepath.Abs("./data")
+    os.Create(path + "/aggregated.log") // hardcoded for now
+    // f, _ := os.Create(path + "/newlog.log") 
+}
+
+func StalkFile(src string, ch chan<- string) {
     // tails file and sends results to channel
     t, err := tail.TailFile(src, tail.Config{Follow: true}) // tail source file
     if err != nil {
