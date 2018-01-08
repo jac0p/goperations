@@ -40,7 +40,7 @@ func TestSourceMatchChkParams(t *testing.T) {
 
 func TestCreateTG(t *testing.T) {
     path, _ := filepath.Abs("./data")
-    tg := path + "/newlog.log"
+    tg := path + "/aggregated.log"
     os.Remove(tg) // remove existing file before testing
     logstalker.CreateTG() // create new file
     if _, err := os.Stat(tg); os.IsNotExist(err) {
