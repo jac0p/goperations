@@ -9,8 +9,10 @@ import (
 
 
 func main() {
-    //logstalker.Run()
+    logstalker.Run()
+}
 
+func testTokenizer() {
     const sentence = "I am a new string full of new opportunities"
 
     iter := tokenizer.Split(sentence, " ")
