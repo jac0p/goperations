@@ -3,3 +3,4 @@ pkg
 src/github.com/
 src/jac0p/logstalker/*.log
 *.DS_Store
+src/jac0p/training/
