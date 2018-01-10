@@ -9,6 +9,6 @@ import (
 
 
 func main() {
-    logstalker.Start()
+    logstalker.Run()
     // fmt.Println(os.Args)
 }
