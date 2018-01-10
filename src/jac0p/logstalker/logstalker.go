@@ -8,28 +8,32 @@ import (
     "path/filepath"
 )
 
+const target = "/aggregated.log"
 
-func Start() {
-    // ch := make(chan string) // channel initialization
-    flag.String("out", "out", "indicates where the application should send it's output")
-    flag.Parse() // parse flags
-    params := ChkParams(flag.Args()) // sends arguments without flags
-    sources := []string{}
+func Run() {
+    params := chkParams()
+    sources := findSources(params)
 
-    // find all source files
-    for _, p := range params {
-        if CheckIfFile(p) {
-            sources = append(sources, p)
-        }
-        if CheckIfDir(p) {
-            sources = append(sources, WalkDir(p)...)
-        }
+    // create target
+    fmt.Printf("creating target file: %s\n", target)
+    createTG()
+
+    ch := make(chan string) // channel initialization
+    for _, src := range sources {
+        go stalkFile(src, ch)
     }
 
-    // go StalkFile(sources, ch)
+    // forward to target
+    for {
+        fmt.Println(<-ch) // prints lines received from channel
+    }
 }
 
-func ChkParams(args []string) ([]string) {
+func chkParams() ([]string) {
+    flag.String("out", "out", "indicates where the application should send it's output")
+    flag.Parse() // parse flags || TODO: will need to return this 
+    args := flag.Args()
+
     if len(args) < 1 {
         fmt.Println("application execution: ./logstalker -out=(log|out|all) log_file1 log_file2 log_file3")
         os.Exit(1)
@@ -37,8 +41,21 @@ func ChkParams(args []string) ([]string) {
     return args
 }
 
+func findSources(params []string) ([]string) {
+    sources := []string{}
+    for _, p := range params {
+        if checkIfFile(p) {
+            sources = append(sources, p)
+        }
+        if checkIfDir(p) {
+            sources = append(sources, walkDir(p)...)
+        }
+    }
+    return sources
+}
+
 // SOOOO DRYYYYYY
-func CheckIfFile(src string) bool {
+func checkIfFile(src string) bool {
     f, err := os.Stat(src)
     if err != nil {
         fmt.Printf("error running stat on %s\n", src)
@@ -53,8 +70,9 @@ func CheckIfFile(src string) bool {
     panic("this should never happen")
 }
 
+
 // SOOOO DRYYYYYY
-func CheckIfDir(src string) bool {
+func checkIfDir(src string) bool {
     f, err := os.Stat(src)
     if err != nil {
         fmt.Printf("error running stat on %s\n", src)
@@ -69,10 +87,10 @@ func CheckIfDir(src string) bool {
     panic("this should never happen")
 }
 
-func WalkDir(dir string) []string {
+func walkDir(dir string) []string {
     o := []string{}
     filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
-        if CheckIfFile(path) {
+        if checkIfFile(path) {
             o = append(o, path)
         }
         return nil
@@ -80,13 +98,12 @@ func WalkDir(dir string) []string {
     return o
 }
 
-func CreateTG() {
+func createTG() {
     path, _ := filepath.Abs("./data")
-    os.Create(path + "/aggregated.log") // hardcoded for now
-    // f, _ := os.Create(path + "/newlog.log") 
+    os.Create(path + target) // hardcoded for now
 }
 
-func StalkFile(src string, ch chan<- string) {
+func stalkFile(src string, ch chan<- string) {
     // tails file and sends results to channel
     t, err := tail.TailFile(src, tail.Config{Follow: true}) // tail source file
     if err != nil {
@@ -97,10 +114,10 @@ func StalkFile(src string, ch chan<- string) {
     }
 }
 
-func readCH() {
-    // loop to read new lines received
-    for {
-        // fmt.Println(<-ch) // prints lines received from channel
-        // f.WriteString(<-ch + "\n")
-    }
-}
+// func readCH(ch <-chan string) {
+//     // loop to read new lines received
+//     for {
+//         fmt.Println(<-ch) // prints lines received from channel
+//         // f.WriteString(<-ch + "\n")
+//     }
+// }
