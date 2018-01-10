@@ -1,6 +1,7 @@
 package logstalker
 
 import (
+    "io"
     "os"
     "fmt"
     "flag"
@@ -11,34 +12,48 @@ import (
 const target = "/aggregated.log"
 
 func Run() {
-    params := chkParams()
+    params, w := chkParams()
     sources := findSources(params)
-
-    // create target
-    fmt.Printf("creating target file: %s\n", target)
-    createTG()
-
     ch := make(chan string) // channel initialization
+
     for _, src := range sources {
         go stalkFile(src, ch)
     }
 
-    // forward to target
     for {
-        fmt.Println(<-ch) // prints lines received from channel
+        readCH(w, ch)
     }
 }
 
-func chkParams() ([]string) {
-    flag.String("out", "out", "indicates where the application should send it's output")
+func chkParams() ([]string, io.Writer) {
+    outPtr := flag.String("out", "out", "indicates where the application should send it's output")
     flag.Parse() // parse flags || TODO: will need to return this 
     args := flag.Args()
+    var w io.Writer
 
     if len(args) < 1 {
         fmt.Println("application execution: ./logstalker -out=(log|out|all) log_file1 log_file2 log_file3")
         os.Exit(1)
     }
-    return args
+
+    switch *outPtr {
+    case "log":
+        fmt.Printf("sending output to %s\n", target)
+        w := createTG()
+        return args, w
+    case "out":
+        fmt.Println("sending output to STDOUT")
+        w := os.Stdout
+        return args, w
+    case "all":
+        fmt.Printf("sending output to STDOUT and %s\n", target)
+        w := io.MultiWriter(createTG(), os.Stdout)
+        return args, w
+    default:
+        w := os.Stdout
+        return args, w
+    }
+    return args, w
 }
 
 func findSources(params []string) ([]string) {
@@ -70,7 +85,6 @@ func checkIfFile(src string) bool {
     panic("this should never happen")
 }
 
-
 // SOOOO DRYYYYYY
 func checkIfDir(src string) bool {
     f, err := os.Stat(src)
@@ -98,9 +112,14 @@ func walkDir(dir string) []string {
     return o
 }
 
-func createTG() {
+func createTG() (*os.File) {
     path, _ := filepath.Abs("./data")
-    os.Create(path + target) // hardcoded for now
+    tg, err := os.Create(path + target) // hardcoded for now
+    if err != nil {
+        fmt.Errorf("unable to create %s: %s", target, err)
+        os.Exit(1)
+    }
+    return tg
 }
 
 func stalkFile(src string, ch chan<- string) {
@@ -114,10 +133,10 @@ func stalkFile(src string, ch chan<- string) {
     }
 }
 
-// func readCH(ch <-chan string) {
-//     // loop to read new lines received
-//     for {
-//         fmt.Println(<-ch) // prints lines received from channel
-//         // f.WriteString(<-ch + "\n")
-//     }
-// }
+func readCH(w io.Writer, ch <-chan string) {
+    // loop to read new lines received from channel
+    for {
+        // fmt.Println(<-ch) // prints lines
+        fmt.Fprintf(w, "%s\n", <-ch)
+    }
+}
