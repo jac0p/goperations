@@ -23,6 +23,7 @@ package cmd
 import (
     // "fmt"
     "os"
+    "sort"
 
     oshelper "jac0p/helper/os"
     log "github.com/sirupsen/logrus"
@@ -44,14 +45,33 @@ func init() {
 
 
 func Run() {
-    if !oshelper.CheckIfDir(tgtDir) {
+    if !oshelper.CheckIfDir(srcDir) {
         log.Error("provided resource is not a directory or you have no permission to view it")
         os.Exit(1)
     }
 
     if hrdDel {
-        oshelper.DeleteDir(tgtDir)
+        oshelper.DeleteDir(srcDir)
     }
+
+    if keepCnt > 0 {
+        chdObjects := oshelper.ListDir(srcDir)
+        chdCount := len(chdObjects)
+        if chdCount <= keepCnt {
+            log.Infof("stopping delete as number of objects to keep matches" +
+                        "or is greater than available (%v & %v)", chdCount, keepCnt)
+        }
+        if rvsList {
+            // deletes new elements first
+            sort.Sort(sort.Reverse(sort.StringSlice(chdObjects)))
+        } else {
+            // deletes old elements first
+            sort.Strings(chdObjects)
+        }
+        log.Infof("ORIG: ", chdObjects)
+        log.Infof("KEEP %v =>", keepCnt, chdObjects[chdCount-keepCnt:])
+    }
+
 }
 
 
