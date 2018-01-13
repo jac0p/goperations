@@ -83,3 +83,14 @@ func CreateTG(target string) (*os.File) {
     return tg
 }
 
+func DeleteDir(target string) {
+    log.Infof("attempting to delete %s", target)
+    err := os.RemoveAll(target)
+    if err != nil {
+        log.Errorf("unable to delete %s", target)
+    }
+}
+
+
+
+
