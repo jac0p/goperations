@@ -8,6 +8,7 @@ import (
     // "sort"
 
     oshelper "jac0p/helper/os"
+    log "github.com/sirupsen/logrus"
 )
 
 func TestCreateTG(t *testing.T) {
@@ -49,3 +50,23 @@ func TestWalkDir(t *testing.T) {
         t.Errorf("WalkDir(%q) = %v", input, fl)
     }
 }
+
+func TestDeleteDir(t *testing.T) {
+    target := "/tmp/deleteme/"
+    log.Debug("creating directory: %s", target)
+    err := os.MkdirAll(target, 0666)
+    if err != nil {
+        t.Errorf("cannot create %s", target)
+    }
+
+    oshelper.DeleteDir("/tmp/deleteme/")
+    if oshelper.CheckIfDir(target) {
+        t.Errorf("directory wasn't deleted..")
+    }
+
+}
+
+
+
+
+
