@@ -5,3 +5,4 @@ src/jac0p/logstalker/*.log
 *.DS_Store
 src/jac0p/training/
 src/jac0p/helper/os/cases/*
+src/gopl.io/*
