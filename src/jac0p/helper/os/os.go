@@ -89,6 +89,7 @@ func DeleteDir(target string) {
     if err != nil {
         log.Errorf("unable to delete %s", target)
     }
+    log.Info("directory deleted.")
 }
 
 
