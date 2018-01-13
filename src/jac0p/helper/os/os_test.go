@@ -45,7 +45,7 @@ func TestWalkDir(t *testing.T) {
     fl := oshelper.WalkDir(input)
     // sort.Strings(fl)
 
-    // this test doesn't really tell all the truth
+    // this test doesn't really tell the whole story
     if len(fl) != len(want) {
         t.Errorf("WalkDir(%q) = %v", input, fl)
     }
@@ -63,9 +63,23 @@ func TestDeleteDir(t *testing.T) {
     if oshelper.CheckIfDir(target) {
         t.Errorf("directory wasn't deleted..")
     }
-
 }
 
+func TestListDir(t *testing.T) {
+    source := "/tmp/listme/"
+    children := []string{"/dirone/", "/dirtwo/", "/dirthree/"}
+
+    for _, child := range children {
+        os.MkdirAll(source + child, 0666)
+    }
+
+    contents := oshelper.ListDir(source)
+    // this test doesn't really tell the whole story
+    if len(contents) != len(children) {
+        t.Errorf("ListDir(%q) = %v", children, contents)
+    }
+
+}
 
 
 
