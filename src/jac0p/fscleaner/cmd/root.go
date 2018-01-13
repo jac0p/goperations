@@ -29,7 +29,7 @@ import (
     // log "github.com/sirupsen/logrus"
 )
 
-var tgtDir string
+var srcDir string
 var keepCnt int
 var sftDel, hrdDel, rvsList bool
 
@@ -58,7 +58,7 @@ func Execute() {
 
 func init() {
     // rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-    rootCmd.PersistentFlags().StringVarP(&tgtDir, "dir", "d", "", "Directory to cleanse or delete")
+    rootCmd.PersistentFlags().StringVarP(&srcDir, "dir", "d", "", "Directory to cleanse or delete")
     rootCmd.PersistentFlags().IntVarP(&keepCnt, "keep", "", 0, "Number of child objects to keep in directory")
     rootCmd.PersistentFlags().BoolVarP(&sftDel, "soft", "", true, "Enables soft deletion")
     rootCmd.PersistentFlags().BoolVarP(&hrdDel, "hard", "", false, "Enables hard deletion")
