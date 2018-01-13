@@ -30,7 +30,8 @@ import (
 )
 
 var tgtDir string
-var sftDel, hrdDel bool
+var keepCnt int
+var sftDel, hrdDel, rvsList bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -58,7 +59,9 @@ func Execute() {
 func init() {
     // rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
     rootCmd.PersistentFlags().StringVarP(&tgtDir, "dir", "d", "", "Directory to cleanse or delete")
+    rootCmd.PersistentFlags().IntVarP(&keepCnt, "keep", "", 0, "Number of child objects to keep in directory")
     rootCmd.PersistentFlags().BoolVarP(&sftDel, "soft", "", true, "Enables soft deletion")
     rootCmd.PersistentFlags().BoolVarP(&hrdDel, "hard", "", false, "Enables hard deletion")
+    rootCmd.PersistentFlags().BoolVarP(&rvsList, "reverse", "", false, "Reverse list of child objects (delete new first)")
 }
 
