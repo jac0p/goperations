@@ -68,8 +68,9 @@ func Run() {
             // deletes old elements first
             sort.Strings(chdObjects)
         }
-        log.Infof("ORIG: ", chdObjects)
-        log.Infof("KEEP %v =>", keepCnt, chdObjects[chdCount-keepCnt:])
+
+        log.Infof("ORIGINAL FOLDER CONTENT => ", chdObjects)
+        log.Infof("KEEPING CONTENT => %v", keepCnt, chdObjects[chdCount-keepCnt:])
     }
 
 }
