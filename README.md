@@ -1,2 +1,2 @@
-# lets_go
-My first adventures with golang
+# goperations
+Collection of sysadmin friendly GO packages
