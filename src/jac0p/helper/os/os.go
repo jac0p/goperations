@@ -23,6 +23,7 @@ package os
 import (
 	// "fmt"
   "os"
+  "io/ioutil"
 
   "path/filepath"
   log "github.com/sirupsen/logrus"
@@ -73,21 +74,34 @@ func WalkDir(dir string) []string {
 }
 
 // creates a file in absolute path
-func CreateTG(target string) (*os.File) {
+func CreateTG(tgt string) (*os.File) {
     // path, _ := filepath.Abs("./data")
-    tg, err := os.Create(target) // hardcoded for now
+    tg, err := os.Create(tgt) // hardcoded for now
     if err != nil {
-        log.Errorf("unable to create %s: %s", target, err)
+        log.Errorf("unable to create %s: %s", tgt, err)
         os.Exit(1)
     }
     return tg
 }
 
-func DeleteDir(target string) {
-    log.Infof("attempting to delete %s", target)
-    err := os.RemoveAll(target)
+func ListDir(src string) []string {
+    o := []string{}
+    log.Infof("listing contents of %s", src)
+    cnt, err := ioutil.ReadDir(src)
     if err != nil {
-        log.Errorf("unable to delete %s", target)
+        log.Errorf("unable to list %s", src)
+    }
+    for _, c := range cnt {
+        o = append(o, c.Name())
+    }
+    return o
+}
+
+func DeleteDir(tgt string) {
+    log.Infof("attempting to delete %s", tgt)
+    err := os.RemoveAll(tgt)
+    if err != nil {
+        log.Errorf("unable to delete %s", tgt)
     }
     log.Info("directory deleted.")
 }
