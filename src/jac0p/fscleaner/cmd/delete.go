@@ -48,11 +48,9 @@ func Run() {
         log.Error("provided resource is not a directory or you have no permission to view it")
         os.Exit(1)
     }
-    log.Info(hrdDel)
 
     if hrdDel {
         oshelper.DeleteDir(tgtDir)
-
     }
 }
 
