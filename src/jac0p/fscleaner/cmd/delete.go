@@ -21,25 +21,25 @@
 package cmd
 
 import (
-	// "fmt"
-  "os"
+    // "fmt"
+    "os"
 
-  oshelper "jac0p/helper/os"
-  log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
+    oshelper "jac0p/helper/os"
+    log "github.com/sirupsen/logrus"
+    "github.com/spf13/cobra"
 )
 
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "Deletes the provided folder and all of it's contents",
-	Run: func(cmd *cobra.Command, args []string) {
-      Run()
-	},
+    Use:   "delete",
+    Short: "Deletes the provided folder and all of it's contents",
+    Run: func(cmd *cobra.Command, args []string) {
+        Run()
+    },
 }
 
 func init() {
-	rootCmd.AddCommand(deleteCmd)
+    rootCmd.AddCommand(deleteCmd)
 }
 
 
@@ -48,5 +48,12 @@ func Run() {
         log.Error("provided resource is not a directory or you have no permission to view it")
         os.Exit(1)
     }
+    log.Info(hrdDel)
+
+    if hrdDel {
+        oshelper.DeleteDir(tgtDir)
+
+    }
 }
+
 
