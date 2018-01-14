@@ -23,6 +23,7 @@ package cmd
 import (
     // "fmt"
     "os"
+    "sort"
 
     oshelper "jac0p/helper/os"
     log "github.com/sirupsen/logrus"
@@ -44,14 +45,58 @@ func init() {
 
 
 func Run() {
-    if !oshelper.CheckIfDir(tgtDir) {
+    if !oshelper.CheckIfDir(srcDir) {
         log.Error("provided resource is not a directory or you have no permission to view it")
         os.Exit(1)
     }
 
-    if hrdDel {
-        oshelper.DeleteDir(tgtDir)
-    }
+    chdObjects := getChildObjects(srcDir) // get sorted list of directory objects
+    delObjects := getToDelete(chdObjects) // get list of doomed objects
+    remove(delObjects)
 }
 
+
+func getChildObjects(src string) []string {
+    return sortObjects(oshelper.ListDir(srcDir))
+}
+
+func sortObjects(obj []string) []string {
+    if rvsList {
+        // deletes new elements first
+        sort.Sort(sort.Reverse(sort.StringSlice(obj)))
+    } else {
+        // deletes old elements first
+        sort.Strings(obj)
+    }
+    return obj
+}
+
+func getToDelete(chdObjects []string) []string {
+    chdCount := len(chdObjects)
+    keepObjects := chdObjects[chdCount-keepCnt:]
+
+    for i := 0; i < len(chdObjects); i++ {
+        for _, k := range keepObjects {
+            if chdObjects[i] == k {
+                chdObjects = append(chdObjects[:i], chdObjects[i+1:]...)
+                i--      // decrease index so we don't skip any elements
+            }
+        }
+    }
+    return chdObjects
+}
+
+func remove(list []string) {
+    if hrdDel {
+        for _, elem := range list {
+            s := srcDir + "/" + elem
+            log.Info("deleting: " + s)
+            oshelper.DeleteDir(s)
+        }
+    }
+    if sftDel {
+        // something like
+        // oshelper.MoveDir(s, ".Trash/s")
+    }
+}
 
