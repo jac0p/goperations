@@ -7,3 +7,4 @@ src/jac0p/training/
 src/jac0p/helper/os/cases/*
 src/gopl.io/*
 src/jac0p/pod-autoscaler/
+src/jac0p/es-cleaner/
