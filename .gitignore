@@ -1,10 +1,10 @@
 bin
 pkg
 src/github.com/
-src/jac0p/logstalker/*.log
+src/rolandvarga/logstalker/*.log
 *.DS_Store
-src/jac0p/training/
-src/jac0p/helper/os/cases/*
+src/rolandvarga/training/
+src/rolandvarga/helper/os/cases/*
 src/gopl.io/*
-src/jac0p/pod-autoscaler/
-src/jac0p/es-cleaner/
+src/rolandvarga/pod-autoscaler/
+src/rolandvarga/es-cleaner/
