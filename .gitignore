@@ -1,12 +1,13 @@
 bin
 pkg
 src/github.com/
-src/rolandvarga/logstalker/*.log
 *.DS_Store
+src/gopl.io/*
+src/honnef.co/
+src/golang.org/x/tools/
+src/rolandvarga/logstalker/*.log
 src/rolandvarga/training/
 src/rolandvarga/helper/os/cases/*
-src/gopl.io/*
 src/rolandvarga/pod-autoscaler/
 src/rolandvarga/es-cleaner/
-src/golang.org/x/tools/
-src/honnef.co/
+src/rolandvarga/arbitrator/
