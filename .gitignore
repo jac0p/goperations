@@ -11,3 +11,4 @@ src/rolandvarga/helper/os/cases/*
 src/rolandvarga/pod-autoscaler/
 src/rolandvarga/es-cleaner/
 src/rolandvarga/arbitrator/
+src/rolandvarga/go-webapp-template/
