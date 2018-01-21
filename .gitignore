@@ -8,3 +8,5 @@ src/rolandvarga/helper/os/cases/*
 src/gopl.io/*
 src/rolandvarga/pod-autoscaler/
 src/rolandvarga/es-cleaner/
+src/golang.org/x/tools/
+src/honnef.co/
